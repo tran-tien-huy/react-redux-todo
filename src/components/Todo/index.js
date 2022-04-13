@@ -1,30 +1,30 @@
 import { 
-  Col, Row, Tag, Checkbox, Input, Button, Select 
+  Col, Row, Tag, Checkbox, Input, Button, Space
 } from 'antd';
 import { useState } from 'react';
 import { useDispatch} from 'react-redux';
 import todoListSlice from '../TodoList/todoSlice';
 import {
+  StarFilled,
   EditOutlined,
   CloseCircleOutlined
 } from '@ant-design/icons';
-const priorityColorMapping = {
-  High: 'red',
-  Medium: 'blue',
-  Low: 'gray',
-};
 
+
+
+const delTodoAction = todoListSlice.actions.delTodo;
+const editTodoAction = todoListSlice.actions.editTodo;
+const toggleTodoPriorityAction = todoListSlice.actions.toggleTodoPriority;
 const toggleTodoStatusAction = todoListSlice.actions.toggleTodoStatus;
-// const delTodoAction = todoListSlice.actions.delTodo;
 
-export default function Todo({ name, id, prioriry, completed}) {
+export default function Todo({ name, id, important, completed}) {
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(completed);
   const [update, setUpdate] = useState(false);
 
   const [todo, setTodo] = useState(name);
-  const [priority, setPriority] = useState(prioriry);
-
+  const [priority, setPriority] = useState(important);
+  console.log(`priority: ${priority}`);
   // hide/show edit form input
   const toggleEdit = () => {
     setUpdate(!update);
@@ -35,125 +35,93 @@ export default function Todo({ name, id, prioriry, completed}) {
     setTodo(e.target.value);
   }
 
+  const handleEditBtnClick = () => {
+    let payload = {
+      type: 'edit',
+      id: id,
+      name: todo,
+      completed: false,
+      priority: priority
+    }
+    dispatch(editTodoAction(payload))
+    setUpdate(false);
+  }
+  const handleDelBtnClick = () => {
+    let payload = {
+      type: 'delete',
+      id: id
+    };
+    dispatch(delTodoAction(payload));
+  }
+  
   // handleInput priority update
-  const handlePriorityUpdate = (value) => {
-    setPriority(value);
+  const handlePriorityUpdate = () => {
+    setPriority(!priority);
+    dispatch(toggleTodoPriorityAction(id));
+
   }
 
   const toggleCheckbox = () => {
     setChecked(!checked);
+    let payload = {
+      type: 'setComplete',
+      id: id,
+    };
     dispatch(toggleTodoStatusAction(id));
   };
 
-  const handleEditBtnClick = () => {
-    dispatch(todoListSlice.actions.editTodo({
-        id: id,
-        name: todo,
-        completed: false,
-        priority: priority
-    }))
-    setUpdate(false);
-  }
   return (
     <Row
       justify='space-between'
       align='center'
       style={{
-        marginBottom: 3,
-        ...(checked ? { opacity: 0.5, textDecoration: 'line-through' } : {}),
+        marginBottom: 3
       }}
     >
       {
         update ? (
           <Col span={24}>
             <Input.Group style={{ display: 'flex' }} compact>
-              <Input value={todo} onChange={handleInputUpdate}/>
-              <Select defaultValue="Medium" value={priority} onChange={handlePriorityUpdate}>
-                <Select.Option value='High' label='High'>
-                  <Tag color='red'>High</Tag>
-                </Select.Option>
-                <Select.Option value='Medium' label='Medium'>
-                  <Tag color='blue'>Medium</Tag>
-                </Select.Option>
-                <Select.Option value='Low' label='Low'>
-                  <Tag color='gray'>Low</Tag>
-                </Select.Option>
-              </Select>
+              <Input value={todo} onChange={handleInputUpdate}/>              
               <Button type='primary' onClick={handleEditBtnClick}>
                 Edit
               </Button>
             </Input.Group>
           </Col>
-        ) 
+        )
         : 
         (
           <>
             <Col
-              span={17}
-              style = {{
-                display: "flex",
-                alignItems: "center"
-              }}
+              span={20}
+              className='flex-v--center d-flex-wrap'
             >
-              <Checkbox checked={checked} onChange={toggleCheckbox}>
+              <Checkbox
+                checked={checked}
+                style={{...(checked ? { opacity: 0.5, textDecoration: 'line-through' } : {})}}
+                onChange={toggleCheckbox}
+              >
                 {name}
               </Checkbox>
             </Col>
-            <Col span={7}>
-              <Row
-                align='center'
-              >
-                <Col span={12}>
-                  <Tag
-                  color={priorityColorMapping[prioriry]} 
-                  style={{
-                    margin: 0,
-                    padding: "5px 10px",
-                    display: "flex",
-                    justifyContent: 'center',
-                    alignItems: 'center'
-                  }}
-                  >
-                  {prioriry}
-                  </Tag>
-                </Col>
-                <Col
-                  span={6}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    cursor: "pointer"
-                  }}
-                >
-                  <EditOutlined 
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    onClick={completed ? null : toggleEdit}
-                  />
-                </Col>
-                <Col
-                  span={6}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    cursor: "pointer"
-                  }}
-                >
-                  <CloseCircleOutlined
-                    style={{
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    onClick={() => dispatch(todoListSlice.actions.delTodo(id))}
-                  />
-                </Col>
-              </Row>
+            <Col span={4} className='flex--center'>
+              <Space size="small">
+                <StarFilled
+                  className= {
+                    `todo__action-icon todo__btn cursor-pointer
+                    ${priority ? `todo__btn-priority--yellow` : `todo__btn-priority`}`
+                  }
+                  onClick={handlePriorityUpdate}
+                />
+                <EditOutlined
+                  className='todo__action-icon todo__btn todo__btn-edit cursor-pointer'
+                  onClick={toggleEdit}
+                />
+                <CloseCircleOutlined
+                  className='todo__action-icon todo__btn todo__btn-close cursor-pointer'
+                  onClick={handleDelBtnClick}
+                />
+              </Space>
             </Col>
           </>
         )

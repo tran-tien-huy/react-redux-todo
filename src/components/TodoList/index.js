@@ -10,24 +10,42 @@ import todoListSlice from './todoSlice';
 
 export default function TodoList() {
   const [todo, setTodo] = useState("");
-  const [priority, setPriority] = useState("Medium");
   
-  // const newTodoList = useSelector(todoListSelector);
   const todosRemaining = useSelector(todosRemainingSelector);
-  
+  let todosCompleted = todosRemaining.filter(item => item.priority == 1);
+  let todosIncompleted = todosRemaining.filter(item => item.priority == 0);
+
+  todosCompleted.sort((a,b) => {
+    if(a.name > b.name) {
+      return 1;
+    }
+    if(a.name < b.name) {
+      return -1;
+    }
+    return 0;
+  });
+
+  todosIncompleted.sort((a,b) => {
+    if(a.name > b.name) {
+      return 1;
+    }
+    if(a.name < b.name) {
+      return -1;
+    }
+    return 0;
+  });
+  let newTodosRemaining = [...todosCompleted, ...todosIncompleted];
   const handleInputChange = (e) => {
     setTodo(e.target.value);
   }
-  const handlePriorityChange = (value) => {
-    setPriority(value);
-  }
   const dispatch = useDispatch();
-  const handleAddBtnClick = () => {    // dispatch actions from UI
+  const handleAddBtnClick = () => {    
+    // dispatch actions from UI
     dispatch(todoListSlice.actions.addTodo({
       id: uuidv4(),
-      name: todo,
+      name: todo.trim(),
       completed: false,
-      priority: priority
+      priority: 0
     }));
     setTodo('');
   }
@@ -35,17 +53,14 @@ export default function TodoList() {
   return (
     <Row style={{ height: 'calc(100% - 40px)' }}>
       <Col span={24} style={{ height: 'calc(100% - 40px)', overflowY: 'auto' }}>
-        {/* <Todo name='Learn React' prioriry='High' />
-        <Todo name='Learn Redux' prioriry='Medium' />
-        <Todo name='Learn JavaScript' prioriry='Low' /> */}
         {
-          todosRemaining.map(todo=> {
+          newTodosRemaining.map((todo) => {
             return (
               <Todo
                 key={todo.id}
                 id={todo.id}
                 name={todo.name}
-                prioriry={todo.priority}
+                important={todo.priority}
                 completed={todo.completed}
               />
             )
@@ -53,19 +68,8 @@ export default function TodoList() {
         }
       </Col>
       <Col span={24}>
-        <Input.Group style={{ display: 'flex' }} compact>
+        <Input.Group style={{ display: 'flex', gap: '20px'}} compact>
           <Input value={todo} onChange={handleInputChange}/>
-          <Select defaultValue="Medium" value={priority} onChange={handlePriorityChange}>
-            <Select.Option value='High' label='High'>
-              <Tag color='red'>High</Tag>
-            </Select.Option>
-            <Select.Option value='Medium' label='Medium'>
-              <Tag color='blue'>Medium</Tag>
-            </Select.Option>
-            <Select.Option value='Low' label='Low'>
-              <Tag color='gray'>Low</Tag>
-            </Select.Option>
-          </Select>
           <Button type='primary' onClick={handleAddBtnClick}>
             Add
           </Button>

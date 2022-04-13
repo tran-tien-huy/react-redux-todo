@@ -1,4 +1,4 @@
-import { Col, Row, Input, Typography, Radio, Select, Tag } from 'antd';
+import { Col, Row, Input, Typography, Radio, Checkbox } from 'antd';
 import {useState} from 'react';
 import { useDispatch } from 'react-redux';
 // import { searchFilterChange, statusFilterChange, prioritiesFilterChange } from '../redux/actions';
@@ -8,9 +8,8 @@ const { Search } = Input;
 export default function Filters() {
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [filterPriorites, setFilterPriorites] = useState([]);
-
+  const [filterStatus, setFilterStatus] = useState(1);
+  const [checked, setChecked] = useState(0);
 
   const handleSearchTextChange = (e) => {
     setSearchText(e.target.value);
@@ -21,12 +20,10 @@ export default function Filters() {
     setFilterStatus(e.target.value);
     dispatch(filtersSlice.actions.statusFilterChange(e.target.value))
   }
-
-  const handleFilterPrioritiesChange = (value) => {
-    setFilterPriorites(value);
-    dispatch(filtersSlice.actions.prioritiesFilterChange(value));
+  const toggleCheckbox = () => {
+    setChecked(1-checked);
+    dispatch(filtersSlice.actions.prioritiesFilterChange(1-checked))
   }
-
   return (
     <Row justify='center'>
       <Col span={24}>
@@ -44,35 +41,24 @@ export default function Filters() {
           Filter By Status
         </Typography.Paragraph>
         <Radio.Group value={filterStatus} onChange={handleFilterStatusChange}>
-          <Radio value='All' checked='true'>All</Radio>
-          <Radio value='Completed'>Completed</Radio>
-          <Radio value='Todo'>To do</Radio>
+          <Radio value={1} checked='true'>All</Radio>
+          <Radio value={2}>Completed</Radio>
+          <Radio value={3}>To do</Radio>
         </Radio.Group>
+
       </Col>
       <Col sm={24}>
         <Typography.Paragraph
           style={{ fontWeight: 'bold', marginBottom: 3, marginTop: 10 }}
         >
-          Filter By Priority
+          Filter By Important
         </Typography.Paragraph>
-        <Select
-          mode='multiple'
-          allowClear
-          placeholder='Please select'
-          style={{ width: '100%' }}
-          value={filterPriorites}
-          onChange={handleFilterPrioritiesChange}
-        >
-          <Select.Option value='High' label='High'>
-            <Tag color='red'>High</Tag>
-          </Select.Option>
-          <Select.Option value='Medium' label='Medium'>
-            <Tag color='blue'>Medium</Tag>
-          </Select.Option>
-          <Select.Option value='Low' label='Low'>
-            <Tag color='gray'>Low</Tag>
-          </Select.Option>
-        </Select>
+        <Checkbox
+            checked={checked == 1 ? true: false}
+            onChange={toggleCheckbox}
+          >
+            Important
+          </Checkbox>
       </Col>
     </Row>
   );

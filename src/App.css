@@ -3,3 +3,69 @@
 .ant-select-multiple .ant-select-selection-item {
   height: 27px;
 }
+
+body .ant-checkbox-wrapper {
+  font-size: 16px!important;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.d-flex-wrap {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.flex--center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-h--center {
+  display: flex;
+  justify-content: center;
+}
+
+.flex-v--center {
+  display: flex;
+  align-items: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.todo__action-icon {
+  font-size: 15px;
+  transition: 0.4s;
+}
+
+.todo__action-icon:hover {
+  transform: scale(1.2);
+}
+
+.todo__btn {
+  cursor: pointer;
+}
+
+.todo__btn-priority {
+}
+
+.todo__btn-priority:hover {
+  color: #FFD36E;
+}
+
+.todo__btn-priority--yellow {
+  color: #FFD36E;
+}
+
+.ant-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.ant-checkbox-wrapper .ant-checkbox+span {
+  word-break: break-all;
+}

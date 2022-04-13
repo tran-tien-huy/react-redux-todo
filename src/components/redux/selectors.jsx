@@ -2,7 +2,7 @@ import { createSelector } from '@reduxjs/toolkit'
 
 export const searchTextSelector = state => state.filters.search;
 export const filterStatusSelector = state => state.filters.status;
-export const filterPrioritesSelector = state => state.filters.priorities;
+export const filterPrioritySelector = state => state.filters.priority;
 export const todoListSelector = state => state.todoList;
 
 
@@ -10,24 +10,24 @@ export const todosRemainingSelector = createSelector(
     todoListSelector,
     searchTextSelector,
     filterStatusSelector,
-    filterPrioritesSelector,
-    (todoList, searchText, status, priorities) => {
+    filterPrioritySelector,
+    (todoList, searchText, status, priority) => {
         let condition = ''
         return todoList.filter((todo) => {
-            if(status=='All') {
+            let todoSearchCondition = todo.name.toLowerCase().includes(searchText.toLowerCase());
+            let condition = '';
+            if(status === 1) {
                 condition = (
-                    priorities.length ? 
-                    todo.name.toLowerCase().includes(searchText.toLowerCase()) 
-                    && priorities.includes(todo.priority) :
-                    todo.name.includes(searchText)
+                    priority ? todoSearchCondition
+                    && priority === todo.priority
+                    : todoSearchCondition
                 );
                 return condition;
             }
-            condition = (
-                todo.name.includes(searchText) 
-                && (status==="Completed" ? todo.completed : !todo.completed)
-                && (priorities.length ? priorities.includes(todo.priority): true)
-            );
+            condition = todoSearchCondition
+            && (status === 2 ? todo.completed: !todo.completed)
+            && (priority ? priority === todo.priority: true);
+
             return condition;
         })
     }
