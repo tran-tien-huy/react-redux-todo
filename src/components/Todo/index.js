@@ -47,11 +47,7 @@ export default function Todo({ name, id, important, completed}) {
     setUpdate(false);
   }
   const handleDelBtnClick = () => {
-    let payload = {
-      type: 'delete',
-      id: id
-    };
-    dispatch(delTodoAction(payload));
+    dispatch(delTodoAction(id));
   }
   
   // handleInput priority update
